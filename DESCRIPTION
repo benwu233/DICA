@@ -1,0 +1,35 @@
+Package: DICA
+Title: Distributional Independent Component Analysis
+Version: 1.0.0
+Authors@R: c(
+    person(given = "Ben",
+           family = "Wu",
+           role = c("aut", "cre"),
+           email = "wuben@ruc.edu.cn"),
+    person(given = "Subhadip",
+           family = "Pal",
+           role = "aut",
+           email = "subhadip.pal@louisville.edu"),
+    person(given = "Jian",
+           family = "Kang",
+           role = "aut",
+           email = "jiankang@umich.edu"),
+    person(given = "Ying",
+           family = "Guo",
+           role = "aut",
+           email = "yguo2@emory.edu")        
+           )
+Description: Distributional Independent Component Analysis (DICA) with a Mixture of Gaussian or Mixture of Wishart Distribution.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    stats,
+    ica,
+    mixAK,
+    mclust,
+    CholWishart,
+    neurobase,
+    oro.nifti

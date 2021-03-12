@@ -4,10 +4,10 @@
 \alias{get_dti}
 \title{Reconstrct DTI observations.}
 \usage{
-get_dti(V1, V2, V3, L1, L2, L3)
+get_dti(V1, V2, V3, L1, L2, L3, mask)
 }
 \arguments{
-\item{L3}{}
+\item{mask}{A 3-D mask has the same dimension with the image data.}
 }
 \value{
 

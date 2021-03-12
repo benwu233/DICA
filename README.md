@@ -45,7 +45,8 @@ V_1 = oro.nifti::readNIfTI(paste0(data_path,"/dti_v1.nii.gz"))
 V_2 = oro.nifti::readNIfTI(paste0(data_path,"/dti_v2.nii.gz"))
 V_3 = oro.nifti::readNIfTI(paste0(data_path,"/dti_v3.nii.gz"))
 
-dtidata = get_dti(V_1,V_2,V_3,L_1,L_2,L_3)
+mask = (L_1!=0)
+dtidata = get_dti(V_1,V_2,V_3,L_1,L_2,L_3,mask)
 res_dti = dica(dtidata$X,K = 20,L =14,tol = 1e-3)
-write_ics(res_dti$S,L_1,(L_1!=0), q = 0.95, paste0(write_path,"dti"))
+write_ics(res_dti$S,L_1,mask, q = 0.95, paste0(write_path,"dti"))
 ```

@@ -6,12 +6,13 @@
 #' @param L1
 #' @param L2
 #' @param L3
+#' @param mask A 3-D mask has the same dimension with the image data.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_dti = function(V1,V2,V3,L1,L2,L3){
+get_dti = function(V1,V2,V3,L1,L2,L3,mask){
   dim0 = dim(V1)
   xgrid = as.matrix(expand.grid(1:dim0[1],1:dim0[2],1:dim0[3]))
 
@@ -22,10 +23,10 @@ get_dti = function(V1,V2,V3,L1,L2,L3){
     l1 = xgrid[i,1]
     l2 = xgrid[i,2]
     l3 = xgrid[i,3]
-    if(L1[l1,l2,l3]!=0){
+    if(mask[l1,l2,l3]!=0){
       xgrid0 = rbind(xgrid0,xgrid[i,])
       lambda = diag(c(L1[l1,l2,l3],L2[l1,l2,l3],L3[l1,l2,l3]))
-      if(lambda[3,3] < 0){
+      if(lambda[3,3] <= 0){
         diag(lambda) = diag(lambda) - lambda[3,3]+ 1e-10
       }
       U = cbind(V1[l1,l2,l3,],V2[l1,l2,l3,],V3[l1,l2,l3,])

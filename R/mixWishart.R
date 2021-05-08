@@ -1,10 +1,16 @@
-mixWishart = function(data,k=5,tol = 0.01,itr.max = 100){
+mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
   n = length(data)
 
-  dataM = matrix(0, nrow = n, ncol = 9)
+  # dataM = matrix(0, nrow = n, ncol = 9)
+  #
+  # for(i in 1:n){
+  #   dataM[i,] = as.numeric(data[[i]])
+  # }
 
-  for(i in 1:n){
-    dataM[i,] = as.numeric(data[[i]])
+  dataM = t( sapply(data,as.numeric) )
+
+  if(verbose){
+    print("Initializing with kmeans...")
   }
 
   tmp = kmeans(dataM,k,iter.max = 612)
@@ -26,6 +32,11 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100){
 
   tag = 0
   loglik = rep(0,itr.max)
+
+  if(verbose){
+    print("Fitting the model with EM...")
+  }
+
   while(tag < itr.max){
 
     tag = tag  + 1
@@ -40,6 +51,18 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100){
     sumlogX = rep(0,k)
     nk = rep(0,k)
 
+    # pi_jk = matrix(0, nrow = n, ncol = k)
+    # for(j in 1:k){
+    #   pi_jk[,j] = sapply(data,dWISHART,df[j],V[j,,],log=TRUE) + log(pi[j])
+    # }
+
+
+    #log_det_data = log( sapply(data,det) + 1e-40 )
+
+    # ind = apply(pi_jk,1,which.max)
+    # nk = table(factor(ind,levels = 1:k))
+
+
     for(i in 1:n){
 
       for(j in 1:k){
@@ -49,7 +72,7 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100){
       ind = which.max(pi_jk[i,])
       sumX[,,ind] = sumX[,,ind] + data[[i]]
       nk[ind] = nk[ind] + 1
-      sumlogX[ind] = sumlogX[ind]  + log( det(data[[i]])+1e-40 )
+      sumlogX[ind] = sumlogX[ind]  + log( det(data[[i]])+1e-40 ) #log_det_data[i]
 
       loglik[tag] = loglik[tag] + pi_jk[i,ind]
     }
@@ -84,8 +107,12 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100){
       }
     }
 
-    #print(paste0("loglik: ",loglik[tag]) )
-    print(paste0("itr: ",tag, " tol: ", tol0))
+
+    if(verbose){
+      print(paste0("itr: ",tag, " tol: ", tol0))
+    }
+
+
 
   }
 
@@ -155,7 +182,6 @@ mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
     theta_df = theta_df_new
     theta_s = theta_s_new
 
-    #print( paste0("itr: ", tag, " tol: ", tol0) )
   }
 
   out  = list()

@@ -12,6 +12,7 @@
 #' @param K The number of components at stage one.
 #' @param L The number of components at stage two, should be no larger than \code{K}.
 #' @param tol Relative convergence tolerance for the log-likelihood.
+#' @param verbose If TRUE, print progress of algorithm to console.
 #'
 #' @return A list includes
 #' \itemize{
@@ -26,7 +27,7 @@
 #' @importFrom stats kmeans
 #'
 #' @examples
-dica = function(Y, K=6, L=3,tol=1e-5){
+dica = function(Y, K=6, L=3,tol=1e-5,verbose = TRUE){
 
   cl0 = class(Y)[1]
 
@@ -34,8 +35,12 @@ dica = function(Y, K=6, L=3,tol=1e-5){
     J = nrow(Y)
     d = ncol(Y)
 
+    if(verbose){
+      print("Stage 1: fitting a mixture distribution")
+    }
+
     model1 = Mclust(Y, G = K, modelNames = "EEI",
-                    control = emControl(tol = tol),verbose=FALSE)
+                    control = emControl(tol = tol),verbose=verbose)
     pi_j = model1$z
 
     order0 = order(apply(model1$parameter$mean,2,mean) )
@@ -43,7 +48,12 @@ dica = function(Y, K=6, L=3,tol=1e-5){
 
   }
   else if(cl0 == "list"){
-    res = mixWishart(Y,k = K,tol= tol,10000)
+
+    if(verbose){
+      print("Stage 1: Fitting a Mixture Distribution.")
+    }
+
+    res = mixWishart(Y,k = K,tol= tol,10000,verbose)
 
     det0 = rep(0,K)
     for(j in 1:K){
@@ -60,6 +70,9 @@ dica = function(Y, K=6, L=3,tol=1e-5){
 
   mlogitProb = Mlogit(pi_j,exp(-300))
 
+  if(verbose){
+    print("Stage 2: ICA Decomposition.")
+  }
   res1 = icaimax(mlogitProb,L,center=FALSE,maxit = 1000)
   S = res1$S
   A = res1$M
@@ -68,6 +81,10 @@ dica = function(Y, K=6, L=3,tol=1e-5){
 
   out$S = S
   out$A = A
+
+  if(verbose){
+    print("Done.")
+  }
 
   return(out)
 }

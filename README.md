@@ -30,7 +30,7 @@ fmridata = oro.nifti::readNIfTI(paste0(data_path,"/fmri.nii.gz"))
 mask = 1 - is.na(fmridata[,,,1])
 
 prep_data = prepfmri(fmridata,mask,40)
-res_fmri = dica(prep_data, K = 20, L = 14, verbose = TRUE)
+res_fmri = dica(prep_data, K = 20, L = 14, itr.max = 1000,verbose = TRUE)
 
 write_ics(res_fmri$S,fmridata,mask, q = 0.95,paste0(write_path,"fmri"))
 ```
@@ -47,6 +47,6 @@ V_3 = oro.nifti::readNIfTI(paste0(data_path,"/dti_v3.nii.gz"))
 
 mask = (L_1!=0)
 dtidata = get_dti(V_1,V_2,V_3,L_1,L_2,L_3,mask)
-res_dti = dica(dtidata$X, K = 20, L = 14, tol = 1e-3, verbose = TRUE)
+res_dti = dica(dtidata$X, K = 20, L = 14, tol = 1e-3,itr.max = 1000, verbose = TRUE)
 write_ics(res_dti$S,L_1,mask, q = 0.95, paste0(write_path,"dti"))
 ```

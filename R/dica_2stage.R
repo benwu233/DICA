@@ -12,6 +12,7 @@
 #' @param K The number of components at stage one.
 #' @param L The number of components at stage two, should be no larger than \code{K}.
 #' @param tol Relative convergence tolerance for the log-likelihood.
+#' @param itr.max Maximum number of algorithm iterations.
 #' @param verbose If TRUE, print progress of algorithm to console.
 #'
 #' @return A list includes
@@ -27,7 +28,7 @@
 #' @importFrom stats kmeans
 #'
 #' @examples
-dica = function(Y, K=6, L=3,tol=1e-5,verbose = TRUE){
+dica = function(Y, K=6, L=3,tol=1e-5,itr.max = 1000,verbose = TRUE){
 
   cl0 = class(Y)[1]
 
@@ -36,7 +37,7 @@ dica = function(Y, K=6, L=3,tol=1e-5,verbose = TRUE){
     d = ncol(Y)
 
     if(verbose){
-      print("Stage 1: fitting a mixture distribution")
+      print("Stage 1: Fitting a Mixture Distribution")
     }
 
     model1 = Mclust(Y, G = K, modelNames = "EEI",
@@ -53,7 +54,7 @@ dica = function(Y, K=6, L=3,tol=1e-5,verbose = TRUE){
       print("Stage 1: Fitting a Mixture Distribution.")
     }
 
-    res = mixWishart(Y,k = K,tol= tol,10000,verbose)
+    res = mixWishart(Y,k = K,tol= tol,itr.max,verbose)
 
     det0 = rep(0,K)
     for(j in 1:K){
@@ -73,7 +74,7 @@ dica = function(Y, K=6, L=3,tol=1e-5,verbose = TRUE){
   if(verbose){
     print("Stage 2: ICA Decomposition.")
   }
-  res1 = icaimax(mlogitProb,L,center=FALSE,maxit = 1000)
+  res1 = icaimax(mlogitProb,L,center=FALSE,maxit = itr.max )
   S = res1$S
   A = res1$M
 

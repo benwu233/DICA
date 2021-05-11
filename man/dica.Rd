@@ -4,7 +4,7 @@
 \alias{dica}
 \title{Distributional ICA}
 \usage{
-dica(Y, K = 6, L = 3, tol = 1e-05, verbose = TRUE)
+dica(Y, K = 6, L = 3, tol = 1e-05, itr.max = 1000, verbose = TRUE)
 }
 \arguments{
 \item{Y}{A numeric matrix or a list. If a matrix, a mixture of Gaussian model
@@ -18,6 +18,8 @@ matrix, corresponding to a observation.}
 \item{L}{The number of components at stage two, should be no larger than \code{K}.}
 
 \item{tol}{Relative convergence tolerance for the log-likelihood.}
+
+\item{itr.max}{Maximum number of algorithm iterations.}
 
 \item{verbose}{If TRUE, print progress of algorithm to console.}
 }

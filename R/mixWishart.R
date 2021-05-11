@@ -1,19 +1,13 @@
 mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
   n = length(data)
 
-  # dataM = matrix(0, nrow = n, ncol = 9)
-  #
-  # for(i in 1:n){
-  #   dataM[i,] = as.numeric(data[[i]])
-  # }
-
   dataM = t( sapply(data,as.numeric) )
 
   if(verbose){
     print("Initializing with kmeans...")
   }
 
-  tmp = kmeans(dataM,k,iter.max = 612)
+  tmp = kmeans(dataM,k,iter.max = itr.max)
 
   #initial
   V = array(0,dim=c(k,3,3))
@@ -27,7 +21,6 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
 
   pi = rep(1/k,k)
 
-  #tol0 = tol + 0.1
   tol0 = NULL
 
   tag = 0
@@ -51,18 +44,6 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
     sumlogX = rep(0,k)
     nk = rep(0,k)
 
-    # pi_jk = matrix(0, nrow = n, ncol = k)
-    # for(j in 1:k){
-    #   pi_jk[,j] = sapply(data,dWISHART,df[j],V[j,,],log=TRUE) + log(pi[j])
-    # }
-
-
-    #log_det_data = log( sapply(data,det) + 1e-40 )
-
-    # ind = apply(pi_jk,1,which.max)
-    # nk = table(factor(ind,levels = 1:k))
-
-
     for(i in 1:n){
 
       for(j in 1:k){
@@ -72,23 +53,25 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
       ind = which.max(pi_jk[i,])
       sumX[,,ind] = sumX[,,ind] + data[[i]]
       nk[ind] = nk[ind] + 1
-      sumlogX[ind] = sumlogX[ind]  + log( det(data[[i]])+1e-40 ) #log_det_data[i]
+      sumlogX[ind] = sumlogX[ind]  + base::log( base::det(data[[i]])+1e-40 ) #log_det_data[i]
 
       loglik[tag] = loglik[tag] + pi_jk[i,ind]
+
     }
 
     for(j in 1:k){
       pi[j] = nk[j]/n
-      sumX_inv[,,j] = solve(sumX[,,j] )
+      sumX_inv[,,j] = base::solve(sumX[,,j] )
     }
+
 
     #M_step
     if(tag>1){
-      tol0 = abs( (loglik[tag] - loglik[tag-1])/loglik[tag-1])
+      tol0 = base::abs( (loglik[tag] - loglik[tag-1])/loglik[tag-1])
       if( tol0 < tol){
 
         for(i in 1:n){
-          tmp = exp( pi_jk[i,] - max(pi_jk[i,]) )
+          tmp = base::exp( pi_jk[i,] - max(pi_jk[i,]) )
           pi_out[i,] = tmp / sum(tmp)
         }
 
@@ -101,19 +84,41 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
     df_old = df
     for(j in 1:k){
       if(nk[j] > 0){
-        tmp = mleWishart(nk[j],sumX_inv[,,j],sumlogX[j],solve(V_old[j,,]),(df_old[j]-4)/2,tol = 0.0001 )
+        tmp = mleWishart(nk[j],sumX_inv[,,j],sumlogX[j],solve(V_old[j,,]),(df_old[j]-4)/2,tol,itr.max)
         V[j,,] = tmp$V
         df[j] = tmp$df
+        if(tmp$notcon1){
+          print("MLE for Wishart distribution NOT converged.")
+          break
+        }
+        if(tmp$notcon2){
+          print("Solution for argmax mvdigamma NOT converged.")
+          break
+        }
       }
     }
 
-
-    if(verbose){
-      print(paste0("itr: ",tag, " tol: ", tol0))
+    if( (tmp$notcon1 + tmp$notcon2) > 0){
+      break
     }
 
+    if(verbose){
+      if(is.null(tol0)){
+        print(paste0("itr: ",tag))
+      }
+      else{
+        print(paste0("itr: ",tag, " tol: ", tol0))
+      }
+
+    }
+
+  }
 
 
+  if(is.null(tol0)==FALSE){
+    if(tol0 > tol){
+      print("EM not converged.")
+    }
   }
 
   out = list()
@@ -127,7 +132,7 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
 }
 
 
-mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
+mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01,itr.max = 100){
 
   tol0 = tol + 0.1
   tag = 0
@@ -144,13 +149,16 @@ mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
   while(tol0 > tol){
 
     tag = tag + 1
+    if(tag > itr.max){
+      break
+    }
     theta_s_new = (2*theta_df + dim0 + 1) * N * sumX_inv
 
-    tmp = sumlogX/N - dim0* log(2) + log( det(theta_s_new))
+    tmp = sumlogX/N - dim0* base::log(2) + base::log( base::det(theta_s_new))
 
     gap = 100
-    lower0 = 1+1e-10
-    upper0 = 1e300
+    lower0 = 1+1e-5
+    upper0 = 1e20
     if( as.numeric( mvdigamma(lower0,dim0) )> tmp){
       target = lower0
     }
@@ -158,7 +166,13 @@ mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
       target = upper0
     }
     else{
-      while(gap>0.00001){
+
+      tag1 = 0
+      while(gap>tol){
+        tag1 = tag1 + 1
+        if(tag1 > itr.max){
+          break
+        }
         mid0 = (lower0 + upper0)/2
         tmp1 = as.numeric( mvdigamma(mid0,dim0) )
 
@@ -169,7 +183,8 @@ mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
           upper0 = mid0
         }
 
-        gap = abs(tmp1 - tmp)
+        gap = base::abs(tmp1 - tmp)
+
       }
 
       target = mid0
@@ -177,10 +192,14 @@ mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
 
     theta_df_new = target - (dim0+1)/2
 
-    tol0 = max(abs( (theta_df_new - theta_df)/(theta_df+1e-30) ), abs(theta_s_new - theta_s)/ (theta_s + 1e-30) )
+    tol0 = base::max(base::abs( (theta_df_new - theta_df)/(theta_df+1e-30) ), base::abs(theta_s_new - theta_s)/ (theta_s + 1e-30) )
 
     theta_df = theta_df_new
     theta_s = theta_s_new
+
+    if(tag1 > itr.max){
+      break
+    }
 
   }
 
@@ -190,6 +209,8 @@ mleWishart = function(N,sumX_inv,sumlogX,theta_s=NA,theta_df=NA,tol=0.01){
   out$theta_df = theta_df
   out$V = solve(theta_s)
   out$df = 2 * theta_df + dim0 + 1
+  out$notcon1 = (tag > itr.max)
+  out$notcon2 = (tag1 > itr.max)
 
   return(out)
 }

@@ -36,7 +36,7 @@ write_ics = function(ICs,nii,mask, q = 0.99, file){
     }
   }
 
-  copyNIfTIHeader(img = nii, arr = out_S)
+  out_S = copyNIfTIHeader(img = nii, arr = out_S)
 
   writeNIfTI(out_S,filename = file)
 }

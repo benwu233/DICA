@@ -4,13 +4,12 @@
 #' @param nii The reference image.
 #' @param mask A 3-D mask.
 #' @param q The quantile thresholding the components.
-#' @file Where the NIfTI file is saved to.
+#' @param file The path and file name to save the NIfTI file (.nii).
 #'
 #' @importFrom stats cov
 #' @importFrom stats quantile
 #' @importFrom neurobase copyNIfTIHeader
 #' @importFrom oro.nifti writeNIfTI
-#' @return
 #' @export
 #'
 #' @examples

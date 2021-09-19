@@ -35,9 +35,9 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
     tag = tag  + 1
 
     #E-step
-
     pi_jk = matrix(0, nrow = n, ncol= k)
     pi_out = matrix(0, nrow = n, ncol= k)
+    logpi_out = matrix(0, nrow = n, ncol= k)
 
     sumX = array(0, dim= c(3,3,k) )
     sumX_inv = array(0, dim= c(3,3,k) )
@@ -72,6 +72,7 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
 
         for(i in 1:n){
           tmp = base::exp( pi_jk[i,] - max(pi_jk[i,]) )
+          logpi_out[i,] = pi_jk[i,]
           pi_out[i,] = tmp / sum(tmp)
         }
 
@@ -109,9 +110,7 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
       else{
         print(paste0("itr: ",tag, " tol: ", tol0))
       }
-
     }
-
   }
 
 
@@ -126,8 +125,8 @@ mixWishart = function(data,k=5,tol = 0.01,itr.max = 100, verbose = TRUE){
   out$df = df
   out$pi = pi
   out$poster = pi_out
+  out$logposter = logpi_out
   out$loglik = loglik
-
   return(out)
 }
 
@@ -221,6 +220,15 @@ Mlogit = function(Pi,e = 0.1){
 
   Pi = Pi+e
   out =  log( Pi[,-K] / Pi[,K]  )
+
+  return(out)
+}
+
+Mlogit2 = function(logPi){
+
+  K = ncol(logPi)
+
+  out =  logPi[,-K] - logPi[,K]
 
   return(out)
 }

@@ -14,9 +14,8 @@ write_ics(ICs, nii, mask, q = 0.99, file)
 \item{mask}{A 3-D mask.}
 
 \item{q}{The quantile thresholding the components.}
-}
-\value{
 
+\item{file}{The path and file name to save the NIfTI file (.nii).}
 }
 \description{
 Write the estimated components into a NIfTI file.

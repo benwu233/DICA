@@ -4,7 +4,16 @@
 \alias{dica}
 \title{Distributional ICA}
 \usage{
-dica(Y, K = 6, L = 3, tol = 1e-05, itr.max = 1000, verbose = TRUE)
+dica(
+  Y,
+  K = 6,
+  L = 3,
+  Rmat = diag(L),
+  tol = 1e-05,
+  itr.max = 1000,
+  log = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{Y}{A numeric matrix or a list. If a matrix, a mixture of Gaussian model
@@ -17,11 +26,15 @@ matrix, corresponding to a observation.}
 
 \item{L}{The number of components at stage two, should be no larger than \code{K}.}
 
+\item{Rmat}{Initial estimate of the \code{L*L} orthogonal rotation matrix at stage two.}
+
 \item{tol}{Relative convergence tolerance for the log-likelihood.}
 
 \item{itr.max}{Maximum number of algorithm iterations.}
 
-\item{verbose}{If TRUE, print progress of algorithm to console.}
+\item{log}{if \code{TRUE}, the posterior probabilities at stage one are calculated on the log scale.}
+
+\item{verbose}{If \code{TRUE}, print progress of algorithm to console.}
 }
 \value{
 A list includes

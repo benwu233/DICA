@@ -1,14 +1,18 @@
 #' @title Reconstrct DTI observations.
 #'
-#' @param V1
-#' @param V2
-#' @param V3
-#' @param L1
-#' @param L2
-#' @param L3
+#' @param V1 V1
+#' @param V2 V2
+#' @param V3 V3
+#' @param L1 L1
+#' @param L2 L2
+#' @param L3 L3
 #' @param mask A 3-D mask has the same dimension with the image data.
 #'
-#' @return
+#' @return A list includes
+#' \itemize{
+#' \item \code{X} - The data list.
+#' \item \code{grid} - The locations of voxels.
+#' }
 #' @export
 #'
 #' @examples

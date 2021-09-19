@@ -7,10 +7,26 @@
 get_dti(V1, V2, V3, L1, L2, L3, mask)
 }
 \arguments{
+\item{V1}{V1}
+
+\item{V2}{V2}
+
+\item{V3}{V3}
+
+\item{L1}{L1}
+
+\item{L2}{L2}
+
+\item{L3}{L3}
+
 \item{mask}{A 3-D mask has the same dimension with the image data.}
 }
 \value{
-
+A list includes
+\itemize{
+\item \code{X} - The data list.
+\item \code{grid} - The locations of voxels.
+}
 }
 \description{
 Reconstrct DTI observations.

@@ -6,6 +6,11 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
+Distributional Independent Component Analysis (DICA) is a new approach
+that performs ICA decomposition on the distribution level, providing a
+unified framework for extracting features across imaging modalities with
+different scales and representations.
+
 ## Installation
 
 Install DICA with:
@@ -50,3 +55,13 @@ dtidata = get_dti(V_1,V_2,V_3,L_1,L_2,L_3,mask)
 res_dti = dica(dtidata$X, K = 20, L = 14, tol = 1e-3,itr.max = 1000, verbose = TRUE)
 write_ics(res_dti$S,L_1,mask, q = 0.95, paste0(write_path,"dti"))
 ```
+
+### References
+
+Wu, B., Pal, S., Kang, J., and Guo, Y.(2021+) Distributional independent
+component analysis for diverse neuroimaging modalities. Biometrics.
+Accepted.
+
+Wu, B., Pal, S., Kang, J., and Guo, Y.(2021+) Rejoinder to
+“Distributional independent component analysis for diverse neuroimaging
+modalities”. Biometrics. Accepted.

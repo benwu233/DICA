@@ -20,7 +20,7 @@ Authors@R: c(
            email = "yguo2@emory.edu")        
            )
 Description: Distributional Independent Component Analysis (DICA) with a Mixture of Gaussian or Mixture of Wishart Distribution.
-License: GPL-3
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
